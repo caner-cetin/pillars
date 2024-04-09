@@ -1,0 +1,301 @@
+{
+    "type": "FeatureCollection",
+    "metadata": {
+        "generated": 1711642260000,
+        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson",
+        "title": "USGS All Earthquakes, Past Hour",
+        "status": 200,
+        "api": "1.10.3",
+        "count": 7
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "mag": 2.1,
+                "place": "4 km W of Nanwalek, Alaska",
+                "time": 1711640640244,
+                "updated": 1711640769580,
+                "tz": null,
+                "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ak02441shh20",
+                "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ak02441shh20.geojson",
+                "felt": null,
+                "cdi": null,
+                "mmi": null,
+                "alert": null,
+                "status": "automatic",
+                "tsunami": 0,
+                "sig": 68,
+                "net": "ak",
+                "code": "02441shh20",
+                "ids": ",ak02441shh20,",
+                "sources": ",ak,",
+                "types": ",origin,phase-data,",
+                "nst": null,
+                "dmin": null,
+                "rms": 0.28,
+                "gap": null,
+                "magType": "ml",
+                "type": "earthquake",
+                "title": "M 2.1 - 4 km W of Nanwalek, Alaska"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -152.0041,
+                    59.363,
+                    75.7
+                ]
+            },
+            "id": "ak02441shh20"
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "mag": 0.66,
+                "place": "27 km SSW of Ocotillo Wells, CA",
+                "time": 1711640636290,
+                "updated": 1711640977397,
+                "tz": null,
+                "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci40701064",
+                "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ci40701064.geojson",
+                "felt": null,
+                "cdi": null,
+                "mmi": null,
+                "alert": null,
+                "status": "automatic",
+                "tsunami": 0,
+                "sig": 7,
+                "net": "ci",
+                "code": "40701064",
+                "ids": ",ci40701064,",
+                "sources": ",ci,",
+                "types": ",nearby-cities,origin,phase-data,scitech-link,",
+                "nst": 17,
+                "dmin": 0.05743,
+                "rms": 0.11,
+                "gap": 85,
+                "magType": "ml",
+                "type": "earthquake",
+                "title": "M 0.7 - 27 km SSW of Ocotillo Wells, CA"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -116.2501667,
+                    32.9185,
+                    11.45
+                ]
+            },
+            "id": "ci40701064"
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "mag": 0.81,
+                "place": "10 km NNW of Anza, CA",
+                "time": 1711640242300,
+                "updated": 1711640597304,
+                "tz": null,
+                "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci40701056",
+                "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ci40701056.geojson",
+                "felt": null,
+                "cdi": null,
+                "mmi": null,
+                "alert": null,
+                "status": "automatic",
+                "tsunami": 0,
+                "sig": 10,
+                "net": "ci",
+                "code": "40701056",
+                "ids": ",ci40701056,",
+                "sources": ",ci,",
+                "types": ",nearby-cities,origin,phase-data,scitech-link,",
+                "nst": 26,
+                "dmin": 0.0417,
+                "rms": 0.16,
+                "gap": 54,
+                "magType": "ml",
+                "type": "earthquake",
+                "title": "M 0.8 - 10 km NNW of Anza, CA"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -116.7083333,
+                    33.6386667,
+                    12.13
+                ]
+            },
+            "id": "ci40701056"
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "mag": 2.33999991,
+                "place": "4 km S of Pāhala, Hawaii",
+                "time": 1711639991330,
+                "updated": 1711640101480,
+                "tz": null,
+                "url": "https://earthquake.usgs.gov/earthquakes/eventpage/hv74152622",
+                "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/hv74152622.geojson",
+                "felt": null,
+                "cdi": null,
+                "mmi": null,
+                "alert": null,
+                "status": "automatic",
+                "tsunami": 0,
+                "sig": 84,
+                "net": "hv",
+                "code": "74152622",
+                "ids": ",hv74152622,",
+                "sources": ",hv,",
+                "types": ",origin,phase-data,",
+                "nst": 45,
+                "dmin": 0.01755,
+                "rms": 0.109999999,
+                "gap": 118,
+                "magType": "md",
+                "type": "earthquake",
+                "title": "M 2.3 - 4 km S of Pāhala, Hawaii"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -155.479995727539,
+                    19.1601657867432,
+                    31.4699993133545
+                ]
+            },
+            "id": "hv74152622"
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "mag": 1.5,
+                "place": "17 km W of Heber, CA",
+                "time": 1711639920740,
+                "updated": 1711640344964,
+                "tz": null,
+                "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci40701040",
+                "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ci40701040.geojson",
+                "felt": null,
+                "cdi": null,
+                "mmi": null,
+                "alert": null,
+                "status": "automatic",
+                "tsunami": 0,
+                "sig": 35,
+                "net": "ci",
+                "code": "40701040",
+                "ids": ",ci40701040,",
+                "sources": ",ci,",
+                "types": ",nearby-cities,origin,phase-data,scitech-link,",
+                "nst": 25,
+                "dmin": 0.05445,
+                "rms": 0.21,
+                "gap": 68,
+                "magType": "ml",
+                "type": "earthquake",
+                "title": "M 1.5 - 17 km W of Heber, CA"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -115.7073333,
+                    32.7015,
+                    9.68
+                ]
+            },
+            "id": "ci40701040"
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "mag": 2.4,
+                "place": "6 km SSE of Maria Antonia, Puerto Rico",
+                "time": 1711639745660,
+                "updated": 1711640722820,
+                "tz": null,
+                "url": "https://earthquake.usgs.gov/earthquakes/eventpage/pr71444038",
+                "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/pr71444038.geojson",
+                "felt": null,
+                "cdi": null,
+                "mmi": null,
+                "alert": null,
+                "status": "reviewed",
+                "tsunami": 0,
+                "sig": 89,
+                "net": "pr",
+                "code": "71444038",
+                "ids": ",pr71444038,",
+                "sources": ",pr,",
+                "types": ",origin,phase-data,",
+                "nst": 6,
+                "dmin": 0.05429,
+                "rms": 0.12,
+                "gap": 193,
+                "magType": "md",
+                "type": "earthquake",
+                "title": "M 2.4 - 6 km SSE of Maria Antonia, Puerto Rico"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -66.8565,
+                    17.925,
+                    15.51
+                ]
+            },
+            "id": "pr71444038"
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "mag": 0.78,
+                "place": "7 km NW of The Geysers, CA",
+                "time": 1711639714130,
+                "updated": 1711639808943,
+                "tz": null,
+                "url": "https://earthquake.usgs.gov/earthquakes/eventpage/nc74025506",
+                "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/nc74025506.geojson",
+                "felt": null,
+                "cdi": null,
+                "mmi": null,
+                "alert": null,
+                "status": "automatic",
+                "tsunami": 0,
+                "sig": 9,
+                "net": "nc",
+                "code": "74025506",
+                "ids": ",nc74025506,",
+                "sources": ",nc,",
+                "types": ",nearby-cities,origin,phase-data,",
+                "nst": 13,
+                "dmin": 0.01005,
+                "rms": 0.02,
+                "gap": 60,
+                "magType": "md",
+                "type": "earthquake",
+                "title": "M 0.8 - 7 km NW of The Geysers, CA"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -122.8168335,
+                    38.8148346,
+                    0.29
+                ]
+            },
+            "id": "nc74025506"
+        }
+    ],
+    "bbox": [
+        -155.47999572754,
+        17.925,
+        0.29,
+        -66.8565,
+        59.363,
+        75.7
+    ]
+}
