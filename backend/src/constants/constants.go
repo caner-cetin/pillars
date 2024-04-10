@@ -20,6 +20,8 @@ const KAFKA_CONNECTION_TIMEOUT = 10
 
 const KAFKA_READER_MAX_BYTES = 10e6
 const KAFKA_PRODUCER_ERROR_KEY = "producer_error"
+const KAFKA_NEW_EARTHQUAKE_BATCH_START_KEY = "new_earthquake_batch_start"
+const KAFKA_NEW_EARTHQUAKE_BATCH_END_KEY = "new_earthquake_batch_end"
 
 const STREAM_EARTHQUAKE_DEFAULT_GRID_SIZE = 0.05
 

@@ -5,7 +5,7 @@
         <div class="row" style="height: 52.5vh;">
           <GoogleMap style="width: 100%; height: 100%" :center="center" :zoom="3">
             <Marker v-for="(location, index) in positions" :key="index"
-              :options="{ position: { lat: location.lat, lng: location.lng } }" @click="showMarkerDetails(index)" />
+              :options="{ position: { lat: location.lat, lng: location.lng } }" @click="showMarkerDetails(location)" />
           </GoogleMap>
         </div>
         <div class="row" style="height: 47.5vh; display: flex;">
@@ -164,6 +164,7 @@ ws.onmessage = (event) => {
     const byte_blob = event.data as Blob
     byte_blob.text().then(text => {
       const data = JSON.parse(text) as Earthquake
+      // if the earthquake s id is in cached earthquakes, then do nothing
       positions.value.push({ lat: data.location.coordinates[1], lng: data.location.coordinates[0] })
       if (currentRowEarthquakes.value.length == earthquakeTablePagination.value.rowsPerPage) {
         // pop the value at currentRowEarthquakes.length unshiftIndexEarthquakeTable
@@ -179,6 +180,7 @@ ws.onmessage = (event) => {
       }
       currentRowEarthquakes.value.unshift(data)
       cachedEarthquakes.value.unshift(data)
+      earthquakeTablePagination.value.rowsNumber++
     }).catch(function (error) {
       console.error('An error occurred:', error)
     })
@@ -197,11 +199,16 @@ function reconnectWS() {
 
 const latestEarthquakeFilter = ref('')
 const onlyShowEarthquakesInTheTableAtMap = ref(false)
-const showMarkerDetails = (index: number) => {
+const showMarkerDetails = (location: LatLng) => {
   renderMarker.value = true
-  selectedMarkerIndex.value = index
+  // search for the location in cachedEarthquakes
+  for (let i = 0; i < cachedEarthquakes.value.length; i++) {
+    if (cachedEarthquakes.value[i].location.coordinates[1] === location.lat && cachedEarthquakes.value[i].location.coordinates[0] === location.lng) {
+      selectedMarkerIndex.value = i
+      break
+    }
+  }
 }
-
 function onLatestEarthquakeRowClick(evt: Event, row: Earthquake) {
   renderMarker.value = true
   selectedMarkerIndex.value = cachedEarthquakes.value.indexOf(row)
@@ -264,6 +271,7 @@ function onLatestEarthquakeTableScroll(requestProp: {
   latestEarthquakesTableLoading.value = true
   httpClient.get('earthquakes/count' + '?filter' + filter).then(response => {
     const data = response.data as EarthquakeCount
+    console.log(data)
     earthquakeTablePagination.value.rowsNumber = data.count
   }).catch((error) => {
     console.error(error)

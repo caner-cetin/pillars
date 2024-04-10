@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/segmentio/kafka-go"
+	"github.com/valyala/fastjson"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -47,40 +48,6 @@ var (
 	}
 )
 
-func GetAllEarthquakes() {
-	var msg kafka.Message
-	writer := kafka.NewWriter(
-		kafka.WriterConfig{
-			Brokers:  []string{constants.KAFKA_ADDR},
-			Topic:    constants.KAFKA_EARTHQUAKE_STREAM_TOPIC,
-			Balancer: &kafka.LeastBytes{},
-		},
-	)
-	defer writer.Close()
-	cursor, err := db.GetCollection(constants.EARTHQUAKE_COLLECTION_NAME).Find(context.Background(), bson.D{})
-	if err != nil {
-		errors.WriteKafkaProducerError(writer, err, context.Background())
-		return
-	}
-	defer cursor.Close(context.Background())
-	for cursor.Next(context.Background()) {
-		var earthquake types.EarthquakeDB
-		if err := cursor.Decode(&earthquake); err != nil {
-			errors.WriteKafkaProducerError(writer, err, context.Background())
-			return
-		}
-		msg = kafka.Message{
-			Key:   []byte(earthquake.ID.Hex()),
-			Value: []byte(cursor.Current.String()),
-		}
-		if err := writer.WriteMessages(context.Background(), msg); err != nil {
-			errors.WriteKafkaProducerError(writer, err, context.Background())
-			return
-		}
-	}
-
-}
-
 func GetLatestEarthquakes() {
 	var msg kafka.Message
 	writer := kafka.NewWriter(
@@ -97,7 +64,20 @@ func GetLatestEarthquakes() {
 		return
 	}
 	defer cursor.Close(context.Background())
+	var sequenceNum int64 = 0
+	var p fastjson.Parser
+	cursor.SetBatchSize(100)
 	for cursor.Next(context.Background()) {
+		if sequenceNum == 0 {
+			msg = kafka.Message{
+				Key:   []byte(constants.KAFKA_NEW_EARTHQUAKE_BATCH_START_KEY),
+				Value: []byte(constants.KAFKA_NEW_EARTHQUAKE_BATCH_START_KEY),
+			}
+			if err := writer.WriteMessages(context.Background(), msg); err != nil {
+				errors.WriteKafkaProducerError(writer, err, context.Background())
+				return
+			}
+		}
 		elems, err := cursor.Current.Elements()
 		if err != nil {
 			errors.WriteKafkaProducerError(writer, err, context.Background())
@@ -116,15 +96,49 @@ func GetLatestEarthquakes() {
 					errors.WriteKafkaProducerError(writer, err, context.Background())
 					return
 				}
+				eq, err := p.Parse(earthquake.String())
+				if err != nil {
+					errors.WriteKafkaProducerError(writer, err, context.Background())
+					return
+				}
+				// if the earthquake is not a valid JSON, return an error
+				if !eq.Exists("_id") {
+					errors.WriteKafkaProducerError(writer, fmt.Errorf("Earthquake does not have an _id field"), context.Background())
+					return
+				}
+				eq.Set("sequence_num", fastjson.MustParse(fmt.Sprintf("%d", sequenceNum)))
+				eq_obj, err := eq.Object()
+				if err != nil {
+					errors.WriteKafkaProducerError(writer, err, context.Background())
+					return
+				}
+				var buf []byte
+				buf = eq_obj.MarshalTo(nil)
 				msg = kafka.Message{
 					Key:   []byte(earthquake.Lookup("_id").String()),
-					Value: []byte(earthquake.String()),
+					Value: []byte(buf),
 				}
 				if err := writer.WriteMessages(context.Background(), msg); err != nil {
 					errors.WriteKafkaProducerError(writer, err, context.Background())
 					return
 				}
 			}
+		}
+		sequenceNum++
+		// we streamed the start message and the whole batch, now we need  to stream the end message
+		//
+		// server will set the batchStart to false, so the client will know that the batch is ended
+		// and will hang the websocket until the next batch starts
+		if !(cursor.TryNext(context.Background())) {
+			msg = kafka.Message{
+				Key:   []byte(constants.KAFKA_NEW_EARTHQUAKE_BATCH_END_KEY),
+				Value: []byte(constants.KAFKA_NEW_EARTHQUAKE_BATCH_END_KEY),
+			}
+			if err := writer.WriteMessages(context.Background(), msg); err != nil {
+				errors.WriteKafkaProducerError(writer, err, context.Background())
+				return
+			}
+			sequenceNum = 0
 		}
 	}
 }
@@ -158,8 +172,10 @@ func GetEarthquakeStream(c echo.Context) error {
 		return err
 	}
 	defer ws.Close()
+	client_ip := ws.RemoteAddr().String()
 	var sentIDs []primitive.ObjectID
-	// we will determine to show the earthquake or not based on the magnitude
+	var batchStart bool = false
+	var fetchNext bool = false
 	for {
 		// no TO ctx, because we want to keep the connection open
 		m, err := reader.ReadMessage(context.Background())
@@ -169,31 +185,60 @@ func GetEarthquakeStream(c echo.Context) error {
 			return err
 		}
 		slog.Info(fmt.Sprintf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), string(m.Value)))
-		if string(m.Key) == constants.KAFKA_PRODUCER_ERROR_KEY {
-			slog.Error(fmt.Sprintf("Kafka producer error: %s", string(m.Value)))
-			ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			return err
+		if string(m.Key) == constants.KAFKA_NEW_EARTHQUAKE_BATCH_START_KEY {
+			// then we arrived at the start of a batch
+			batchStart = true
+			fetchNext = true
+			slog.Info(fmt.Sprintf("Started batch streaming to %s", client_ip))
 		}
-		var earthquake types.EarthquakeDB
-		err = bson.UnmarshalExtJSON(m.Value, true, &earthquake)
-		if err != nil {
-			slog.Error(fmt.Sprintf("Failed to unmarshal message to EarthquakeDB. Error: %s", err.Error()))
-			ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			return err
+		if string(m.Key) == constants.KAFKA_NEW_EARTHQUAKE_BATCH_END_KEY {
+			// if the streaming of this batch ended, then we need to wait until the next batch starts
+			//
+			// by setting the batchStart back to false, we will be sure that
+			//
+			// start -> documents -> end
+			//
+			// nothing will get in between the producer/consumer loop of kafka
+			batchStart = false
+			fetchNext = false
 		}
-		if !slices.Contains(sentIDs, earthquake.ID) {
-			marshalled_bytes, err := json.Marshal(earthquake)
-			if err != nil {
-				slog.Error(fmt.Sprintf("Failed to marshal message to JSON. Error: %s", err.Error()))
-				ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-				return err
+		if !batchStart {
+			continue
+		} else {
+			// if fetch next is true, then we just got the "hey i started" message
+			// so it is not a document, we need to fetch the next one
+			if fetchNext {
+				fetchNext = false
+			} else {
+				if string(m.Key) == constants.KAFKA_PRODUCER_ERROR_KEY {
+					slog.Error(fmt.Sprintf("Kafka producer error: %s", string(m.Value)))
+					ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+					return err
+				}
+				var earthquake types.EarthquakeDB
+				err = bson.UnmarshalExtJSON(m.Value, true, &earthquake)
+				if err != nil {
+					slog.Error(fmt.Sprintf("Failed to unmarshal message to EarthquakeDB. Error: %s", err.Error()))
+					ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+					return err
+				}
+				if !slices.Contains(sentIDs, earthquake.ID) {
+					marshalled_bytes, err := json.Marshal(earthquake)
+					if err != nil {
+						slog.Error(fmt.Sprintf("Failed to marshal message to JSON. Error: %s", err.Error()))
+						ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+						return err
+					}
+					if err := ws.WriteMessage(websocket.BinaryMessage, marshalled_bytes); err != nil {
+						slog.Error(fmt.Sprintf("Failed to write message to websocket. Error: %s", err.Error()))
+						ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+						return err
+					}
+					slog.Info(fmt.Sprintf("Sent message to %s. Message: %s", client_ip, string(marshalled_bytes)))
+
+					sentIDs = append(sentIDs, earthquake.ID)
+				}
 			}
-			if err := ws.WriteMessage(websocket.BinaryMessage, marshalled_bytes); err != nil {
-				slog.Error(fmt.Sprintf("Failed to write message to websocket. Error: %s", err.Error()))
-				ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-				return err
-			}
-			sentIDs = append(sentIDs, earthquake.ID)
 		}
 
 	}

@@ -9,7 +9,7 @@ or, Kartaca Case Study for Caner Cetin. Pillars is shorter, and cooler.
   - [Demos, Explanations, and Screenshots](#demos-explanations-and-screenshots)
   - [Why?](#why)
     - [Why MongoDB?](#why-mongodb)
-    - [Why website refreshes itself too often after starting?](#why-website-refreshes-itself-too-often-after-starting)
+    - [Why website refreshes itself too often after starting in dev mode?](#why-website-refreshes-itself-too-often-after-starting-in-dev-mode)
 
 
 ## Disclaimer
@@ -98,7 +98,6 @@ For wiping everything:
 https://github.com/caner-cetin/canercetin-usg-kartaca-2024/assets/92731060/e9c5acb7-a3bc-4ade-9762-b5f50a031a8f
 
 As I said, frontend is really simple, and probably not the nicest job you will see. I am mainly backend developer, soo. Still did my best. I hope you like it.
-
 
 
 ## Why?
