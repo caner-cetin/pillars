@@ -1,6 +1,6 @@
 # Pillars
 
-or, Kartaca Case Study for Caner Cetin. Pillars is shorter, and cooler.
+this was a case study for kartaca. they trashed my work for a disclosed and ungiven reason, after making me wait for a whole month. making this public, maybe someone in the future may understand the time I spent here.
 
 - [Pillars](#pillars)
   - [Disclaimer](#disclaimer)
@@ -101,14 +101,6 @@ As I said, frontend is really simple, and probably not the nicest job you will s
 
 
 ## Why?
-
-### Why MongoDB?
-
-- change streams
-
-as the Apache Beam pipeline works and Flink executes, we will update the Mongo collection. Now, frontend works by connecting to a websocket endpoint to a route. How does that route knows data in the earthquake collection is updated and should send the new data to the frontend? Well, MongoDB change streams!
-
-https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/changestream/
 
 ### Why website refreshes itself too often after starting in dev mode?
 
