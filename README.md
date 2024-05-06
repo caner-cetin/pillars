@@ -8,7 +8,6 @@ this was a case study for kartaca. they trashed my work for a disclosed and ungi
   - [Pitfalls](#pitfalls)
   - [Demos, Explanations, and Screenshots](#demos-explanations-and-screenshots)
   - [Why?](#why)
-    - [Why MongoDB?](#why-mongodb)
     - [Why website refreshes itself too often after starting in dev mode?](#why-website-refreshes-itself-too-often-after-starting-in-dev-mode)
 
 
