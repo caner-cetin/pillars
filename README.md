@@ -1,7 +1,5 @@
 # Pillars
 
-this was a case study for kartaca. they trashed my work for a disclosed and ungiven reason, after making me wait for a whole month. making this public, maybe someone in the future may understand the time I spent here.
-
 - [Pillars](#pillars)
   - [Disclaimer](#disclaimer)
   - [Installation](#installation)
